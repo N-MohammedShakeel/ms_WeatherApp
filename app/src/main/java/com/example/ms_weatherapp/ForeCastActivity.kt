@@ -15,9 +15,9 @@ import com.example.ms_weatherapp.mvvm.WeatherVm
 class ForeCastActivity : AppCompatActivity() {
 
     private lateinit var adapterForeCastAdapter: ForeCastAdapter
-    lateinit var viM: WeatherVm
-    lateinit var rvF: RecyclerView
-    lateinit var binding: ActivityForeCastBinding
+    private lateinit var viM: WeatherVm
+    private lateinit var rvF: RecyclerView
+    private lateinit var binding: ActivityForeCastBinding
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +30,7 @@ class ForeCastActivity : AppCompatActivity() {
 
         rvF = binding.rvForeCast // Assigning the value to rvForeCast
 
-        val sharedPrefs = SharedPrefs.getInstance(context = applicationContext)
+        val sharedPrefs = SharedPrefs.getInstance(applicationContext)
         val city = sharedPrefs.getValueOrNull("city")
 
         if (city != null) {
@@ -39,15 +39,15 @@ class ForeCastActivity : AppCompatActivity() {
             viM.getForecastupcoming()
         }
 
-        viM.forecastWeatherLiveData.observe(this, Observer {
-            val setNewlist = it as List<WeatherList>
+        viM.forecastWeatherLiveData.observe(this, Observer { forecastList ->
+            val setNewList = forecastList as List<WeatherList>
 
-            Log.d("Forecast LiveData", setNewlist.toString())
-            adapterForeCastAdapter.setList(setNewlist)
+            Log.d("Forecast LiveData", setNewList.toString())
+            adapterForeCastAdapter.setList(setNewList)
             rvF.adapter = adapterForeCastAdapter
 
-            val isAdapterAttached = binding.rvForeCast.adapter != null
-            Log.d("forecast", " forecast,Adapter is attached: $isAdapterAttached")
+            val isAdapterAttached = rvF.adapter != null
+            Log.d("forecast", "Adapter is attached: $isAdapterAttached")
         })
     }
 }

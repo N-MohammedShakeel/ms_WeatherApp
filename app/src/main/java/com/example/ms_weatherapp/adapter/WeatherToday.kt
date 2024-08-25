@@ -14,116 +14,64 @@ import com.example.ms_weatherapp.R
 import com.example.ms_weatherapp.WeatherList
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
-class WeatherToday: RecyclerView.Adapter<TodayHolder>() {
+class WeatherToday : RecyclerView.Adapter<TodayHolder>() {
 
-     private var listOfTodayWeather =  listOf<WeatherList>()
-
+    private var listOfTodayWeather = listOf<WeatherList>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodayHolder {
-
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.todayhourlylist,parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.todayhourlylist, parent, false)
         return TodayHolder(view)
-
     }
 
     override fun getItemCount(): Int {
-
         return listOfTodayWeather.size
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: TodayHolder, position: Int) {
-
         val todayForeCast = listOfTodayWeather[position]
 
-        holder.timeDisplay.text = todayForeCast.dtTxt!!.substring(11,16).toString()
+        holder.timeDisplay.text = todayForeCast.dtTxt?.substring(11, 16) ?: "N/A"
 
         val temperatureFahrenheit = todayForeCast.main?.temp
-        val temperatureCelsius = (temperatureFahrenheit?.minus(273.15))
-        val temperatureFormatted = String.format("%.2f",temperatureCelsius)
-
-        // for ° type alt+0176
+        val temperatureCelsius = temperatureFahrenheit?.minus(273.15)
+        val temperatureFormatted = String.format("%.2f", temperatureCelsius ?: 0.0)
         holder.tempDisplay.text = "$temperatureFormatted °C"
 
-        val calender = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("HH::mm")
-        val formattedTime = dateFormat.format(calender.time)
+        val calendar = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val formattedTime = dateFormat.format(calendar.time)
 
-        val timeofapi = todayForeCast.dtTxt!!.split(" ")
-        val partafterspace = timeofapi[1]
+        val timeofapi = todayForeCast.dtTxt?.split(" ")?.getOrNull(1) ?: "N/A"
 
-        Log.e("time" , "formatted time: ${formattedTime}, timeofapi: ${partafterspace}")
+        Log.e("time", "formatted time: $formattedTime, timeofapi: $timeofapi")
 
-        for(i in todayForeCast.weather){
-            if(i.icon == "O1d"){
-                holder.imageDisplay.setImageResource(R.drawable.c_s)
-
+        for (i in todayForeCast.weather) {
+            when (i.icon) {
+                "01d", "01n" -> holder.imageDisplay.setImageResource(R.drawable.c_s)
+                "02d", "02n" -> holder.imageDisplay.setImageResource(R.drawable.scattered_clouds)
+                "03d", "03n" -> holder.imageDisplay.setImageResource(R.drawable.scattered_clouds)
+                "10d", "10n" -> holder.imageDisplay.setImageResource(R.drawable.chance_rain)
+                "04d", "04n" -> holder.imageDisplay.setImageResource(R.drawable.cloud)
+                "09d", "09n" -> holder.imageDisplay.setImageResource(R.drawable.chance_rain)
+                "11d", "11n" -> holder.imageDisplay.setImageResource(R.drawable.thunder)
+                "13d", "13n" -> holder.imageDisplay.setImageResource(R.drawable.snow)
+                "50d", "50n" -> holder.imageDisplay.setImageResource(R.drawable.mist)
             }
-            if(i.icon == "O1n"){
-                holder.imageDisplay.setImageResource(R.drawable.c_s)
-
-            }
-            if(i.icon == "O2d"){
-                holder.imageDisplay.setImageResource(R.drawable.scattered_clouds)
-
-            }
-            if(i.icon == "O2n"){
-                holder.imageDisplay.setImageResource(R.drawable.scattered_clouds)
-
-            }
-            if(i.icon == "03d" || i.icon == "03n"){
-                holder.imageDisplay.setImageResource(R.drawable.scattered_clouds)
-
-            }
-            if(i.icon == "10d"){
-                holder.imageDisplay.setImageResource(R.drawable.chance_rain)
-
-            }
-            if(i.icon == "10n"){
-                holder.imageDisplay.setImageResource(R.drawable.chance_rain)
-
-            }
-            if(i.icon == "O4d" || i.icon == "04n"){
-                holder.imageDisplay.setImageResource(R.drawable.cloud)
-
-            }
-            if(i.icon == "O9d" || i.icon == "09n"){
-                holder.imageDisplay.setImageResource(R.drawable.chance_rain)
-
-            }
-
-
-            if(i.icon == "11d" || i.icon == "11n"){
-                holder.imageDisplay.setImageResource(R.drawable.thunder)
-
-            }
-
-            if(i.icon == "13d" || i.icon == "13n"){
-                holder.imageDisplay.setImageResource(R.drawable.snow)
-
-            }
-
-            if(i.icon == "50d" || i.icon == "50n"){
-                holder.imageDisplay.setImageResource(R.drawable.mist)
-
-            }
-
         }
-
-
     }
 
-    fun setList(listOfToday : List<WeatherList>){
+    fun setList(listOfToday: List<WeatherList>) {
         this.listOfTodayWeather = listOfToday
+        notifyDataSetChanged() // Notify the adapter about data changes
     }
-
 }
 
-class TodayHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-    val imageDisplay : ImageView = itemView.findViewById(R.id.imageDisplay)
-    val tempDisplay : TextView = itemView.findViewById(R.id.tempDisplay)
-    val timeDisplay : TextView = itemView.findViewById(R.id.timeDisplay)
-
+class TodayHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val imageDisplay: ImageView = itemView.findViewById(R.id.imageDisplay)
+    val tempDisplay: TextView = itemView.findViewById(R.id.tempDisplay)
+    val timeDisplay: TextView = itemView.findViewById(R.id.timeDisplay)
 }
